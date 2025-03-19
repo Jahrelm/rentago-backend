@@ -53,3 +53,5 @@ build/
 *.swp
 *.swo
 .DS_Store
+
+server.port=8081

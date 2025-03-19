@@ -30,7 +30,7 @@ public class CgroundBackendApplication {
 			Set<Role> roles = new HashSet<>();
 			roles.add(adminRole);
 
-			ApplicationUser admin = new ApplicationUser(1, "admin", passwordEncode.encode("password"), roles, "Admin Full Name");
+			ApplicationUser admin = new ApplicationUser(1, "admin", passwordEncode.encode("password"), roles, "Admin Full Name", "1234567890");
 			userRepository.save(admin);
 		};
 	}

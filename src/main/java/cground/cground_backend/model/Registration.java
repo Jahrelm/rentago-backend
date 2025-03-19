@@ -5,16 +5,18 @@ public class Registration {
     private String password;
     private String fullName;
     private String userType; // "TENANT" or "LANDLORD"
+    private String phoneNumber;
 
     public Registration(){
         super();
     }
     
-    public Registration(String username, String password, String fullName, String userType) {
+    public Registration(String username, String password, String fullName, String userType, String phoneNumber) {
         this.username = username;
         this.password = password;
         this.fullName = fullName;
         this.userType = userType;
+        this.phoneNumber = phoneNumber;
     }
 
     public String getUsername() {
@@ -49,10 +51,18 @@ public class Registration {
         this.userType = userType;
     }
 
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
     public String toString(){
         return (
                 "Registration info: Email : " + this.username +
                 " password : "+ this.password + " Full Name : " + this.fullName +
-                " User Type: " + this.userType);
+                " User Type: " + this.userType + " Phone Number: " + this.phoneNumber);
     }
 }

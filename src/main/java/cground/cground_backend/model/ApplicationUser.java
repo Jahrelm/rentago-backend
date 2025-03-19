@@ -22,6 +22,7 @@ public class ApplicationUser implements UserDetails {
     @Column(unique = true)
     private String password;
     private String fullName;
+    private String phoneNumber;
     private String resetToken;
 
     private LocalDateTime resetTokenExpiry;
@@ -44,12 +45,13 @@ public class ApplicationUser implements UserDetails {
 
     }
 
-    public ApplicationUser(Integer userId, String username, String password, Set<Role> authorities, String fullName) {
+    public ApplicationUser(Integer userId, String username, String password, Set<Role> authorities, String fullName, String phoneNumber) {
         this.userId = userId;
         this.username = username;
         this.password = password;
         this.authorities = authorities;
         this.fullName = fullName;
+        this.phoneNumber = phoneNumber;
 
     }
 
@@ -143,6 +145,14 @@ public class ApplicationUser implements UserDetails {
 
     public void setResetTokenExpiry(LocalDateTime resetTokenExpiry) {
         this.resetTokenExpiry = resetTokenExpiry;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     // Add getter and setter for version

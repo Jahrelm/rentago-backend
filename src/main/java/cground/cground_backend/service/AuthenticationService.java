@@ -48,7 +48,7 @@ public class AuthenticationService {
     private EmailService emailService;
 
 
-    public ApplicationUser registerUser(String username, String password, String fullName, String userType){
+    public ApplicationUser registerUser(String username, String password, String fullName, String userType, String phoneNumber){
         String encodedPassword = passwordEncoder.encode(password);
         Set<Role> authorities = new HashSet<>();
         
@@ -69,7 +69,7 @@ public class AuthenticationService {
             authorities.add(tenantRole);
         }
 
-        ApplicationUser newUser = new ApplicationUser(null, username, encodedPassword, authorities, fullName);
+        ApplicationUser newUser = new ApplicationUser(null, username, encodedPassword, authorities, fullName, phoneNumber);
         return userRepository.save(newUser);
     }
 

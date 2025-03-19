@@ -21,7 +21,11 @@ public class AuthenticationController {
     @PostMapping("/register")
     public ApplicationUser registerUser(@RequestBody Registration body){
         return authenticationService.registerUser(
-                body.getUsername(), body.getPassword(), body.getFullName(), body.getUserType());
+                body.getUsername(), 
+                body.getPassword(), 
+                body.getFullName(), 
+                body.getUserType(),
+                body.getPhoneNumber());
     }
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody Registration body){
