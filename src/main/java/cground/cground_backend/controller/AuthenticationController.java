@@ -13,7 +13,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin("http://localhost:3000")
 public class AuthenticationController {
     @Autowired
     private AuthenticationService authenticationService;
@@ -27,6 +26,7 @@ public class AuthenticationController {
                 body.getUserType(),
                 body.getPhoneNumber());
     }
+
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody Registration body){
         try {
@@ -35,6 +35,5 @@ public class AuthenticationController {
         } catch (ResponseStatusException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
         }
-
     }
 }
