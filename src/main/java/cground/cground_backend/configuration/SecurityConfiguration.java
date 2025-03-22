@@ -83,8 +83,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/api/maintenance/**").permitAll();
                     auth.requestMatchers("/api/properties/**").permitAll();
-                    auth.requestMatchers("/products-checkout/**").permitAll();
-                    auth.requestMatchers("/cart/**").permitAll();
+                    auth.requestMatchers("/api/documents/**").permitAll();
                     auth.requestMatchers("/auth/**").permitAll();
                     auth.requestMatchers("/support/**").permitAll();
                     auth.requestMatchers("/contact/**").permitAll();
