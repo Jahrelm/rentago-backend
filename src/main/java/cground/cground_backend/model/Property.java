@@ -18,7 +18,11 @@ public class Property {
     private String city;
     private String state;
     private String zipCode;
-    private String propertyType; // e.g., apartment, house, condo
+    private String propertyType;
+    private Integer units;
+
+    @Column(length = 2000)
+    private String photos;
 
     @ManyToOne
     @JoinColumn(name = "landlord_id", nullable = false)
@@ -77,6 +81,22 @@ public class Property {
 
     public void setPropertyType(String propertyType) {
         this.propertyType = propertyType;
+    }
+
+    public Integer getUnits() {
+        return units;
+    }
+
+    public void setUnits(Integer units) {
+        this.units = units;
+    }
+
+    public String getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(String photos) {
+        this.photos = photos;
     }
 
     public ApplicationUser getLandlord() {

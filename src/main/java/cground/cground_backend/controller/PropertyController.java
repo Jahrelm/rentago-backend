@@ -9,6 +9,7 @@ import cground.cground_backend.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -28,14 +29,28 @@ public class PropertyController {
     public ResponseEntity<?> addProperty(
             @PathVariable Integer landlordId,
             @RequestParam String userType,
-            @RequestBody Property property) {
+            @RequestParam String address,
+            @RequestParam String city,
+            @RequestParam String state,
+            @RequestParam String zipCode,
+            @RequestParam String propertyType,
+            @RequestParam(required = false) Integer units,
+            @RequestParam(required = false) MultipartFile[] photos) {
         try {
             if (!"LANDLORD".equalsIgnoreCase(userType)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body("Only landlords can add properties");
             }
             
-            Property savedProperty = maintenanceService.addPropertyForLandlord(landlordId, property);
+            Property property = new Property();
+            property.setAddress(address);
+            property.setCity(city);
+            property.setState(state);
+            property.setZipCode(zipCode);
+            property.setPropertyType(propertyType);
+            property.setUnits(units);
+            
+            Property savedProperty = maintenanceService.addPropertyForLandlord(landlordId, property, photos);
             return ResponseEntity.ok(savedProperty);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -101,5 +116,12 @@ public class PropertyController {
     public ResponseEntity<?>getAllTenants(@PathVariable Integer landlordId){
         List<ApplicationUser> tenancies = maintenanceService.getTenantsByLandlord(landlordId);
         return ResponseEntity.ok(tenancies);
+    }
+
+    @GetMapping("/landlord/{landlordId}")
+    public ResponseEntity<?> getAllPropertiesByLandlord(@PathVariable Integer landlordId){
+        List<Property> properties = maintenanceService.getAllPropertyByLandlord(landlordId);
+        return ResponseEntity.ok(properties);
+
     }
 }
