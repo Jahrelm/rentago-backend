@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class MaintenanceServiceImpl implements MaintenanceService {
@@ -98,6 +99,19 @@ public class MaintenanceServiceImpl implements MaintenanceService {
         ApplicationUser landlord = landlordOptional.get();
         List<Property> properties = propertyRepository.findByLandlord(landlord);
         return new ArrayList<>(properties);
+    }
+
+    @Override
+    public List<Property> getPropertiesByTenant(Integer tenantId) {
+        Optional<ApplicationUser> tenantOptional = userRepository.findByUserId(tenantId);
+        if (!tenantOptional.isPresent()) {
+            return new ArrayList<>();
+        }
+        ApplicationUser tenant = tenantOptional.get();
+        List<Tenancy> tenancies = tenancyRepository.findByTenantAndActive(tenant, true);
+        return tenancies.stream()
+            .map(Tenancy::getProperty)
+            .collect(Collectors.toList());
     }
 
     @Override

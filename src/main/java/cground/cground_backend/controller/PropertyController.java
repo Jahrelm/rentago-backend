@@ -16,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/properties")
+@CrossOrigin("*")
 public class PropertyController {
     private final MaintenanceService maintenanceService;
     private final UserService userService;
@@ -122,6 +123,22 @@ public class PropertyController {
     public ResponseEntity<?> getAllPropertiesByLandlord(@PathVariable Integer landlordId){
         List<Property> properties = maintenanceService.getAllPropertyByLandlord(landlordId);
         return ResponseEntity.ok(properties);
+    }
 
+    @GetMapping("/tenant/{tenantId}")
+    public ResponseEntity<?> getTenantRentedProperties(
+            @PathVariable Integer tenantId,
+            @RequestParam String userType) {
+        try {
+            if (!"TENANT".equalsIgnoreCase(userType)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Only tenants can access this endpoint");
+            }
+            List<Property> properties = maintenanceService.getPropertiesByTenant(tenantId);
+            return ResponseEntity.ok(properties);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error retrieving rented properties: " + e.getMessage());
+        }
     }
 }

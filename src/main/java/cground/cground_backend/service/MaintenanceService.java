@@ -18,5 +18,6 @@ public interface MaintenanceService {
     Property addPropertyForLandlord(Integer landlordId, Property property, MultipartFile[] photos) throws IOException;
     Tenancy addTenantToProperty(Integer tenantId, Long propertyId, Tenancy tenancy);
     List<Property> getAllPropertyByLandlord(Integer landlordId);
+    List<Property> getPropertiesByTenant(Integer tenantId);
 }
 
