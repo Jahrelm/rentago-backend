@@ -71,6 +71,7 @@ public class MaintenanceServiceImpl implements MaintenanceService {
     }
 
 
+
     @Override
     public List<MaintenanceRequest> getAllRequestsForLandlord(Integer landlordId) {
         Optional<ApplicationUser> landlordOptional = userRepository.findByUserId(landlordId);
@@ -159,6 +160,29 @@ public class MaintenanceServiceImpl implements MaintenanceService {
         }
 
         return propertyRepository.save(property);
+    }
+
+    public List<Property> searchProperty(Integer landlordId, String address){
+        Optional<ApplicationUser> landlordOptional = userRepository.findByUserId(landlordId);
+        if (!landlordOptional.isPresent()) {
+            throw new RuntimeException("Landlord not found with ID: " + landlordId);
+        }
+        
+        List<Property> properties = propertyRepository.findByAddress(address);
+        if (properties.isEmpty()) {
+            throw new RuntimeException("No properties found with address: " + address);
+        }
+        
+        // Filter properties to only return those belonging to the specified landlord
+        List<Property> landlordProperties = properties.stream()
+            .filter(property -> property.getLandlord().getUserId().equals(landlordId))
+            .collect(Collectors.toList());
+            
+        if (landlordProperties.isEmpty()) {
+            throw new RuntimeException("No properties found with address: " + address + " belonging to the specified landlord");
+        }
+        
+        return landlordProperties;
     }
 
     @Override

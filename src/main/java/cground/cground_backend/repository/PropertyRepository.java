@@ -13,4 +13,7 @@ import java.util.List;
 public interface PropertyRepository extends JpaRepository<Property, Long> {
     @Query("SELECT p FROM Property p WHERE p.landlord = :landlord")
     List<Property> findByLandlord(@Param("landlord") ApplicationUser landlord);
+    
+    @Query("SELECT p FROM Property p WHERE p.address = :address")
+    List<Property> findByAddress(@Param("address") String address);
 }

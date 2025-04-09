@@ -96,6 +96,12 @@ public class PropertyController {
         }
     }
 
+    @GetMapping("/search/{landlordId}")
+    public ResponseEntity<?> searchProperty(@PathVariable Integer landlordId, @RequestParam String address){
+        List<Property> properties = maintenanceService.searchProperty(landlordId, address);
+        return ResponseEntity.ok(properties);
+    }
+
     @GetMapping("/maintenance/{landlordId}")
     public ResponseEntity<?> getLandlordRequests(
             @PathVariable Integer landlordId,

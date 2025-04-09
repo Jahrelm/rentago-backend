@@ -19,5 +19,6 @@ public interface MaintenanceService {
     Tenancy addTenantToProperty(Integer tenantId, Long propertyId, Tenancy tenancy);
     List<Property> getAllPropertyByLandlord(Integer landlordId);
     List<Property> getPropertiesByTenant(Integer tenantId);
+    List<Property> searchProperty(Integer landlordId, String address);
 }
 
