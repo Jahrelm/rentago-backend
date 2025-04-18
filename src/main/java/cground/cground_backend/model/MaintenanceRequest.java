@@ -10,6 +10,18 @@ import java.time.LocalDateTime;
 @Table(name = "MaintenanceRequest")
 public class MaintenanceRequest {
 
+    public enum Status {
+        SUBMITTED,
+        IN_PROGRESS,
+        COMPLETED
+    }
+
+    public enum Priority {
+        LOW,
+        MEDIUM,
+        HIGH
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -23,7 +35,11 @@ public class MaintenanceRequest {
 
     private String description;
 
-    private String priorityLevel;
+    @Enumerated(EnumType.STRING)
+    private Priority priorityLevel;
+
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
     @Column(length = 2000)
     private String photo;
@@ -62,12 +78,20 @@ public class MaintenanceRequest {
         this.description = description;
     }
 
-    public String getPriorityLevel() {
+    public Priority getPriorityLevel() {
         return priorityLevel;
     }
 
-    public void setPriorityLevel(String priorityLevel) {
+    public void setPriorityLevel(Priority priorityLevel) {
         this.priorityLevel = priorityLevel;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     public LocalDateTime getCreatedAt() {

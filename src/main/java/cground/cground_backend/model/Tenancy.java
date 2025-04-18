@@ -9,6 +9,17 @@ import java.time.LocalDate;
 @Table(name = "tenancies")
 public class Tenancy {
 
+    public enum TenancyStatus {
+        PENDING,
+        ACTIVE,
+        TERMINATED
+    }
+
+    public enum RentStatus {
+        CURRENT,
+        OVERDUE
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -24,10 +35,17 @@ public class Tenancy {
 
     private LocalDate startDate;
     private LocalDate endDate;
-    private boolean active;
     private double monthlyRent;
 
+    @Enumerated(EnumType.STRING)
+    private TenancyStatus tenancyStatus;
+
+    @Enumerated(EnumType.STRING)
+    private RentStatus rentStatus;
+
     public Tenancy() {
+        this.tenancyStatus = TenancyStatus.PENDING;
+        this.rentStatus = RentStatus.CURRENT;
     }
 
     public Long getId() {
@@ -70,19 +88,31 @@ public class Tenancy {
         this.endDate = endDate;
     }
 
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
     public double getMonthlyRent() {
         return monthlyRent;
     }
 
     public void setMonthlyRent(double monthlyRent) {
         this.monthlyRent = monthlyRent;
+    }
+
+    public TenancyStatus getTenancyStatus() {
+        return tenancyStatus;
+    }
+
+    public void setTenancyStatus(TenancyStatus tenancyStatus) {
+        this.tenancyStatus = tenancyStatus;
+    }
+
+    public RentStatus getRentStatus() {
+        return rentStatus;
+    }
+
+    public void setRentStatus(RentStatus rentStatus) {
+        this.rentStatus = rentStatus;
+    }
+
+    public boolean isActive() {
+        return this.tenancyStatus == TenancyStatus.ACTIVE;
     }
 }

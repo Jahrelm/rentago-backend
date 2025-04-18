@@ -10,9 +10,9 @@ import java.util.List;
 public interface MaintenanceRequestService {
    
     Iterable<MaintenanceRequest> list();
-    void createMaintenanceRequest(String title, String description, String priorityLevel, MultipartFile[] photos, Maintenance maintenance) throws IOException;
-    MaintenanceRequest createRequest(Integer userId, String title, String description, String priorityLevel, MultipartFile photo);
+    void createMaintenanceRequest(String title, String description, MaintenanceRequest.Priority priorityLevel, MultipartFile[] photos, Maintenance maintenance) throws IOException;
+    MaintenanceRequest createRequest(Integer userId, String title, String description, MaintenanceRequest.Priority priorityLevel, MultipartFile photo);
     List<MaintenanceRequest> getRequestsByUserId(Integer userId);
-    MaintenanceRequest updateRequestStatus(Long requestId, String status);
+    MaintenanceRequest updateRequestStatus(Long requestId, MaintenanceRequest.Status status);
     MaintenanceRequest getRequestById(Long requestId);
 } 

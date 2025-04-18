@@ -65,7 +65,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             authorities.add(tenantRole);
         }
 
-        ApplicationUser newUser = new ApplicationUser(null, username, encodedPassword, authorities, fullName, phoneNumber);
+        ApplicationUser newUser = new ApplicationUser(null, username, encodedPassword, authorities, 
+            fullName, phoneNumber, username, "", "", "", "", "", "");
         return userRepository.save(newUser);
     }
 

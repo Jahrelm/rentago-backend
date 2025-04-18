@@ -32,7 +32,7 @@ public class MaintenanceRequestController {
             @PathVariable Integer userId,
             @RequestParam String title,
             @RequestParam String description,
-            @RequestParam String priorityLevel,
+            @RequestParam MaintenanceRequest.Priority priorityLevel,
             @RequestParam String userType,
             @RequestParam(required = false) MultipartFile[] photos) {
         try {
@@ -53,24 +53,40 @@ public class MaintenanceRequestController {
                     .body("Error creating maintenance request: " + e.getMessage());
         }
     }
+
+    @PutMapping("/{requestId}/status")
+    public ResponseEntity<?> updateRequestStatus(
+            @PathVariable Long requestId,
+            @RequestParam MaintenanceRequest.Status status,
+            @RequestParam String userType) {
+        try {
+            if (!"LANDLORD".equalsIgnoreCase(userType)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Only landlords can update maintenance request status");
+            }
+            
+            MaintenanceRequest updatedRequest = maintenanceRequestService.updateRequestStatus(requestId, status);
+            return ResponseEntity.ok(updatedRequest);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Error updating maintenance request status: " + e.getMessage());
+        }
+    }
+
     @GetMapping("/{userId}/getTenantRequests")
     public ResponseEntity<?> getTenantRequests(@PathVariable Integer userId){
         List<MaintenanceRequest> request = maintenanceService.getAllRequestForTenant(userId);
         return ResponseEntity.ok(request);
-
     }
     
     @GetMapping("/landlord/{landlordId}/requests")
     public ResponseEntity<?> getLandlordRequests(@PathVariable Integer landlordId, @RequestParam String userType) {
         try {
-            // Verify user is a landlord
             if (!"LANDLORD".equalsIgnoreCase(userType)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only landlords can access this endpoint");
             }
-            // Get all maintenance requests from tenants associated with this landlord
             List<MaintenanceRequest> requests = maintenanceService.getAllRequestsForLandlord(landlordId);
             return ResponseEntity.ok(requests);
-
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error retrieving maintenance requests: " + e.getMessage());

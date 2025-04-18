@@ -23,6 +23,13 @@ public class ApplicationUser implements UserDetails {
     private String password;
     private String fullName;
     private String phoneNumber;
+    private String email;
+    private String address;
+    private String city;
+    private String state;
+    private String zipCode;
+    private String emergencyContactName;
+    private String emergencyContactPhone;
     private String resetToken;
 
     private LocalDateTime resetTokenExpiry;
@@ -45,13 +52,20 @@ public class ApplicationUser implements UserDetails {
 
     }
 
-    public ApplicationUser(Integer userId, String username, String password, Set<Role> authorities, String fullName, String phoneNumber) {
+    public ApplicationUser(Integer userId, String username, String password, Set<Role> authorities, String fullName, String phoneNumber, String email, String address, String city, String state, String zipCode, String emergencyContactName, String emergencyContactPhone) {
         this.userId = userId;
         this.username = username;
         this.password = password;
         this.authorities = authorities;
         this.fullName = fullName;
         this.phoneNumber = phoneNumber;
+        this.email = email;
+        this.address = address;
+        this.city = city;
+        this.state = state;
+        this.zipCode = zipCode;
+        this.emergencyContactName = emergencyContactName;
+        this.emergencyContactPhone = emergencyContactPhone;
 
     }
 
@@ -153,6 +167,62 @@ public class ApplicationUser implements UserDetails {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public String getZipCode() {
+        return zipCode;
+    }
+
+    public void setZipCode(String zipCode) {
+        this.zipCode = zipCode;
+    }
+
+    public String getEmergencyContactName() {
+        return emergencyContactName;
+    }
+
+    public void setEmergencyContactName(String emergencyContactName) {
+        this.emergencyContactName = emergencyContactName;
+    }
+
+    public String getEmergencyContactPhone() {
+        return emergencyContactPhone;
+    }
+
+    public void setEmergencyContactPhone(String emergencyContactPhone) {
+        this.emergencyContactPhone = emergencyContactPhone;
     }
 
     // Add getter and setter for version

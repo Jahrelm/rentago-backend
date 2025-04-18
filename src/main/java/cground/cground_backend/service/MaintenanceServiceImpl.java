@@ -70,8 +70,6 @@ public class MaintenanceServiceImpl implements MaintenanceService {
         return new ArrayList<>();
     }
 
-
-
     @Override
     public List<MaintenanceRequest> getAllRequestsForLandlord(Integer landlordId) {
         Optional<ApplicationUser> landlordOptional = userRepository.findByUserId(landlordId);
@@ -91,6 +89,7 @@ public class MaintenanceServiceImpl implements MaintenanceService {
         
         return allRequests;
     }
+
     @Override
     public List<Property> getAllPropertyByLandlord(Integer landlordId){
         Optional<ApplicationUser> landlordOptional = userRepository.findByUserId(landlordId);
@@ -109,7 +108,7 @@ public class MaintenanceServiceImpl implements MaintenanceService {
             return new ArrayList<>();
         }
         ApplicationUser tenant = tenantOptional.get();
-        List<Tenancy> tenancies = tenancyRepository.findByTenantAndActive(tenant, true);
+        List<Tenancy> tenancies = tenancyRepository.findByTenantAndTenancyStatus(tenant, Tenancy.TenancyStatus.ACTIVE);
         return tenancies.stream()
             .map(Tenancy::getProperty)
             .collect(Collectors.toList());
@@ -125,7 +124,7 @@ public class MaintenanceServiceImpl implements MaintenanceService {
         List<Property> properties = propertyRepository.findByLandlord(landlord);
         Set<ApplicationUser> tenants = new HashSet<>();
         for (Property property : properties) {
-            List<Tenancy> tenancies = tenancyRepository.findByPropertyAndActive(property, true);
+            List<Tenancy> tenancies = tenancyRepository.findByPropertyAndTenancyStatus(property, Tenancy.TenancyStatus.ACTIVE);
             for (Tenancy tenancy : tenancies) {
                 tenants.add(tenancy.getTenant());
             }
@@ -201,7 +200,7 @@ public class MaintenanceServiceImpl implements MaintenanceService {
         tenancy.setProperty(propertyOptional.get());
         tenancy.setStartDate(tenancy.getStartDate());
         tenancy.setEndDate(tenancy.getEndDate());
-        tenancy.setActive(tenancy.isActive());
+        tenancy.setTenancyStatus(Tenancy.TenancyStatus.ACTIVE);
         tenancy.setMonthlyRent(tenancy.getMonthlyRent());
 
         return tenancyRepository.save(tenancy);

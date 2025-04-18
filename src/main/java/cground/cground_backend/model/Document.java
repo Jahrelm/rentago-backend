@@ -9,6 +9,13 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "documents")
 public class Document implements Serializable {
+    public enum DocumentType {
+        LEASE_AGREEMENT,
+        INVOICE,
+        MAINTENANCE_REPORT,
+        OTHER
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,10 +28,17 @@ public class Document implements Serializable {
     @JoinColumn(name = "landlord_id", nullable = false)
     private ApplicationUser landlord;
 
+    @ManyToOne
+    @JoinColumn(name = "uploaded_by_id", nullable = false)
+    private ApplicationUser uploadedBy;
+
     private String name;
     private String description;
     private String filePath;
     private LocalDateTime uploadedAt;
+
+    @Enumerated(EnumType.STRING)
+    private DocumentType documentType;
 
     public Long getId() {
         return id;
@@ -48,6 +62,14 @@ public class Document implements Serializable {
 
     public void setLandlord(ApplicationUser landlord) {
         this.landlord = landlord;
+    }
+
+    public ApplicationUser getUploadedBy() {
+        return uploadedBy;
+    }
+
+    public void setUploadedBy(ApplicationUser uploadedBy) {
+        this.uploadedBy = uploadedBy;
     }
 
     public String getName() {
@@ -80,5 +102,13 @@ public class Document implements Serializable {
 
     public void setUploadedAt(LocalDateTime uploadedAt) {
         this.uploadedAt = uploadedAt;
+    }
+
+    public DocumentType getDocumentType() {
+        return documentType;
+    }
+
+    public void setDocumentType(DocumentType documentType) {
+        this.documentType = documentType;
     }
 }

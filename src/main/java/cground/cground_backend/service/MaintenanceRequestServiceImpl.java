@@ -34,11 +34,12 @@ public class MaintenanceRequestServiceImpl implements MaintenanceRequestService 
     }
 
     @Override
-    public void createMaintenanceRequest(String title, String description, String priorityLevel, MultipartFile[] photos, Maintenance maintenance) throws IOException {
+    public void createMaintenanceRequest(String title, String description, MaintenanceRequest.Priority priorityLevel, MultipartFile[] photos, Maintenance maintenance) throws IOException {
         MaintenanceRequest maintenanceRequest = new MaintenanceRequest();
         maintenanceRequest.setTitle(title);
         maintenanceRequest.setDescription(description);
         maintenanceRequest.setPriorityLevel(priorityLevel);
+        maintenanceRequest.setStatus(MaintenanceRequest.Status.SUBMITTED);
         maintenanceRequest.setCreatedAt(LocalDateTime.now());
         maintenanceRequest.setMaintenance(maintenance);
 
@@ -64,7 +65,7 @@ public class MaintenanceRequestServiceImpl implements MaintenanceRequestService 
     }
 
     @Override
-    public MaintenanceRequest createRequest(Integer userId, String title, String description, String priorityLevel, MultipartFile photo) {
+    public MaintenanceRequest createRequest(Integer userId, String title, String description, MaintenanceRequest.Priority priorityLevel, MultipartFile photo) {
         // Implementation needed
         throw new UnsupportedOperationException("Method not implemented");
     }
@@ -76,14 +77,17 @@ public class MaintenanceRequestServiceImpl implements MaintenanceRequestService 
     }
 
     @Override
-    public MaintenanceRequest updateRequestStatus(Long requestId, String status) {
-        // Implementation needed
-        throw new UnsupportedOperationException("Method not implemented");
+    public MaintenanceRequest updateRequestStatus(Long requestId, MaintenanceRequest.Status status) {
+        MaintenanceRequest request = maintenanceRequestRepository.findById(requestId)
+            .orElseThrow(() -> new RuntimeException("Maintenance request not found with ID: " + requestId));
+        
+        request.setStatus(status);
+        return maintenanceRequestRepository.save(request);
     }
 
     @Override
     public MaintenanceRequest getRequestById(Long requestId) {
-        // Implementation needed
-        throw new UnsupportedOperationException("Method not implemented");
+        return maintenanceRequestRepository.findById(requestId)
+            .orElseThrow(() -> new RuntimeException("Maintenance request not found with ID: " + requestId));
     }
 } 

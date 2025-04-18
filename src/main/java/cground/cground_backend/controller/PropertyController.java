@@ -1,10 +1,12 @@
 package cground.cground_backend.controller;
 
-import cground.cground_backend.model.MaintenanceRequest;
 import cground.cground_backend.model.Property;
+import cground.cground_backend.model.Property.PropertyStatus;
 import cground.cground_backend.model.Tenancy;
+import cground.cground_backend.model.Tenancy.RentStatus;
+import cground.cground_backend.model.Tenancy.TenancyStatus;
 import cground.cground_backend.model.ApplicationUser;
-import cground.cground_backend.service.MaintenanceService;
+import cground.cground_backend.service.PropertyService;
 import cground.cground_backend.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,11 +20,11 @@ import java.util.List;
 @RequestMapping("/api/properties")
 @CrossOrigin("*")
 public class PropertyController {
-    private final MaintenanceService maintenanceService;
+    private final PropertyService propertyService;
     private final UserService userService;
 
-    public PropertyController(MaintenanceService maintenanceService, UserService userService) {
-        this.maintenanceService = maintenanceService;
+    public PropertyController(PropertyService propertyService, UserService userService) {
+        this.propertyService = propertyService;
         this.userService = userService;
     }
 
@@ -51,7 +53,7 @@ public class PropertyController {
             property.setPropertyType(propertyType);
             property.setUnits(units);
             
-            Property savedProperty = maintenanceService.addPropertyForLandlord(landlordId, property, photos);
+            Property savedProperty = propertyService.addPropertyForLandlord(landlordId, property, photos);
             return ResponseEntity.ok(savedProperty);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -66,7 +68,6 @@ public class PropertyController {
             @RequestParam String tenantEmail,
             @RequestParam(required = false) LocalDate startDate,
             @RequestParam(required = false) LocalDate endDate,
-            @RequestParam(required = false, defaultValue = "true") boolean active,
             @RequestParam(required = false, defaultValue = "0.0") double monthlyRent) {
         try {
             if (!"LANDLORD".equalsIgnoreCase(userType)) {
@@ -85,10 +86,9 @@ public class PropertyController {
             Tenancy tenancy = new Tenancy();
             tenancy.setStartDate(startDate != null ? startDate : LocalDate.now());
             tenancy.setEndDate(endDate);
-            tenancy.setActive(active);
             tenancy.setMonthlyRent(monthlyRent);
             
-            Tenancy savedTenancy = maintenanceService.addTenantToProperty(tenant.getUserId(), propertyId, tenancy);
+            Tenancy savedTenancy = propertyService.addTenantToProperty(tenant.getUserId(), propertyId, tenancy);
             return ResponseEntity.ok(savedTenancy);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -96,38 +96,151 @@ public class PropertyController {
         }
     }
 
-    @GetMapping("/search/{landlordId}")
-    public ResponseEntity<?> searchProperty(@PathVariable Integer landlordId, @RequestParam String address){
-        List<Property> properties = maintenanceService.searchProperty(landlordId, address);
-        return ResponseEntity.ok(properties);
+    @PutMapping("/tenancy/{tenancyId}/status")
+    public ResponseEntity<?> updateTenancyStatus(
+            @PathVariable Long tenancyId,
+            @RequestParam String userType,
+            @RequestParam TenancyStatus status) {
+        try {
+            if (!"LANDLORD".equalsIgnoreCase(userType)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Only landlords can update tenancy status");
+            }
+            
+            Tenancy updatedTenancy = propertyService.updateTenancyStatus(tenancyId, status);
+            return ResponseEntity.ok(updatedTenancy);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Error updating tenancy status: " + e.getMessage());
+        }
     }
 
-    @GetMapping("/maintenance/{landlordId}")
-    public ResponseEntity<?> getLandlordRequests(
-            @PathVariable Integer landlordId,
+    @PutMapping("/tenancy/{tenancyId}/rent-status")
+    public ResponseEntity<?> updateRentStatus(
+            @PathVariable Long tenancyId,
+            @RequestParam String userType,
+            @RequestParam RentStatus status) {
+        try {
+            if (!"LANDLORD".equalsIgnoreCase(userType)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Only landlords can update rent status");
+            }
+            
+            Tenancy updatedTenancy = propertyService.updateRentStatus(tenancyId, status);
+            return ResponseEntity.ok(updatedTenancy);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Error updating rent status: " + e.getMessage());
+        }
+    }
+
+    @PutMapping("/{propertyId}/status")
+    public ResponseEntity<?> updatePropertyStatus(
+            @PathVariable Long propertyId,
+            @RequestParam String userType,
+            @RequestParam PropertyStatus status) {
+        try {
+            if (!"LANDLORD".equalsIgnoreCase(userType)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Only landlords can update property status");
+            }
+            
+            Property updatedProperty = propertyService.updatePropertyStatus(propertyId, status);
+            return ResponseEntity.ok(updatedProperty);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Error updating property status: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/status/{status}")
+    public ResponseEntity<?> getPropertiesByStatus(
+            @PathVariable PropertyStatus status,
             @RequestParam String userType) {
         try {
             if (!"LANDLORD".equalsIgnoreCase(userType)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("Only landlords can access this endpoint");
+                    .body("Only landlords can view properties by status");
             }
-            List<MaintenanceRequest> requests = maintenanceService.getAllRequestsForLandlord(landlordId);
-            return ResponseEntity.ok(requests);
+            
+            List<Property> properties = propertyService.getPropertiesByStatus(status);
+            return ResponseEntity.ok(properties);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error retrieving maintenance requests: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Error retrieving properties: " + e.getMessage());
         }
+    }
+
+    @GetMapping("/landlord/{landlordId}/status/{status}")
+    public ResponseEntity<?> getPropertiesByLandlordAndStatus(
+            @PathVariable Integer landlordId,
+            @PathVariable PropertyStatus status,
+            @RequestParam String userType) {
+        try {
+            if (!"LANDLORD".equalsIgnoreCase(userType)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Only landlords can view properties by status");
+            }
+            
+            List<Property> properties = propertyService.getPropertiesByLandlordAndStatus(landlordId, status);
+            return ResponseEntity.ok(properties);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Error retrieving properties: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/tenancy/status/{status}")
+    public ResponseEntity<?> getTenanciesByStatus(
+            @PathVariable TenancyStatus status,
+            @RequestParam String userType) {
+        try {
+            if (!"LANDLORD".equalsIgnoreCase(userType)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Only landlords can view tenancies by status");
+            }
+            
+            List<Tenancy> tenancies = propertyService.getTenanciesByStatus(status);
+            return ResponseEntity.ok(tenancies);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Error retrieving tenancies: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/tenancy/rent-status/{status}")
+    public ResponseEntity<?> getTenanciesByRentStatus(
+            @PathVariable RentStatus status,
+            @RequestParam String userType) {
+        try {
+            if (!"LANDLORD".equalsIgnoreCase(userType)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Only landlords can view tenancies by rent status");
+            }
+            
+            List<Tenancy> tenancies = propertyService.getTenanciesByRentStatus(status);
+            return ResponseEntity.ok(tenancies);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Error retrieving tenancies: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/search/{landlordId}")
+    public ResponseEntity<?> searchProperty(@PathVariable Integer landlordId, @RequestParam String address){
+        List<Property> properties = propertyService.searchProperty(landlordId, address);
+        return ResponseEntity.ok(properties);
     }
 
     @GetMapping("/{landlordId}")
     public ResponseEntity<?>getAllTenants(@PathVariable Integer landlordId){
-        List<ApplicationUser> tenancies = maintenanceService.getTenantsByLandlord(landlordId);
+        List<ApplicationUser> tenancies = propertyService.getTenantsByLandlord(landlordId);
         return ResponseEntity.ok(tenancies);
     }
 
     @GetMapping("/landlord/{landlordId}")
     public ResponseEntity<?> getAllPropertiesByLandlord(@PathVariable Integer landlordId){
-        List<Property> properties = maintenanceService.getAllPropertyByLandlord(landlordId);
+        List<Property> properties = propertyService.getAllPropertyByLandlord(landlordId);
         return ResponseEntity.ok(properties);
     }
 
@@ -140,7 +253,7 @@ public class PropertyController {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body("Only tenants can access this endpoint");
             }
-            List<Property> properties = maintenanceService.getPropertiesByTenant(tenantId);
+            List<Property> properties = propertyService.getPropertiesByTenant(tenantId);
             return ResponseEntity.ok(properties);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

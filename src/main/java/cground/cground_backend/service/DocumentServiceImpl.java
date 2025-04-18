@@ -2,6 +2,7 @@ package cground.cground_backend.service;
 
 import cground.cground_backend.model.ApplicationUser;
 import cground.cground_backend.model.Document;
+import cground.cground_backend.model.Document.DocumentType;
 import cground.cground_backend.repository.DocumentRepository;
 import cground.cground_backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,12 +39,15 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public String uploadDocument(Integer tenantId, Integer landlordId, String description, MultipartFile file) throws IOException {
+    public String uploadDocument(Integer tenantId, Integer landlordId, Integer uploadedById, String description, DocumentType documentType, MultipartFile file) throws IOException {
         ApplicationUser tenant = userRepository.findByUserId(tenantId)
             .orElseThrow(() -> new RuntimeException("Tenant not found"));
         
         ApplicationUser landlord = userRepository.findByUserId(landlordId)
             .orElseThrow(() -> new RuntimeException("Landlord not found"));
+
+        ApplicationUser uploadedBy = userRepository.findByUserId(uploadedById)
+            .orElseThrow(() -> new RuntimeException("Uploader not found"));
 
         String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
         Path targetLocation = storageLocation.resolve(filename);
@@ -55,7 +59,9 @@ public class DocumentServiceImpl implements DocumentService {
         document.setFilePath(targetLocation.toString());
         document.setTenant(tenant);
         document.setLandlord(landlord);
+        document.setUploadedBy(uploadedBy);
         document.setUploadedAt(LocalDateTime.now());
+        document.setDocumentType(documentType);
 
         documentRepository.save(document);
         return "File uploaded successfully";
@@ -73,20 +79,19 @@ public class DocumentServiceImpl implements DocumentService {
     public List<Document> getDocumentsByTenant(Integer tenantId) {
         ApplicationUser tenant = userRepository.findByUserId(tenantId)
             .orElseThrow(() -> new RuntimeException("Tenant not found"));
-        return ((List<Document>) documentRepository.findAll())
-            .stream()
-            .filter(doc -> doc.getTenant().equals(tenant))
-            .toList();
+        return documentRepository.findByTenant(tenant);
     }
 
     @Override
     public List<Document> getDocumentsByLandlord(Integer landlordId) {
         ApplicationUser landlord = userRepository.findByUserId(landlordId)
             .orElseThrow(() -> new RuntimeException("Landlord not found"));
-        return ((List<Document>) documentRepository.findAll())
-            .stream()
-            .filter(doc -> doc.getLandlord().equals(landlord))
-            .toList();
+        return documentRepository.findByLandlord(landlord);
+    }
+
+    @Override
+    public List<Document> getDocumentsByType(DocumentType documentType) {
+        return documentRepository.findByDocumentType(documentType);
     }
 
     @Override

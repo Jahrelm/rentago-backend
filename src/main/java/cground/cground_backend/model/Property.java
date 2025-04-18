@@ -10,6 +10,12 @@ import java.util.List;
 @Table(name = "properties")
 public class Property {
 
+    public enum PropertyStatus {
+        AVAILABLE,
+        RENTED,
+        UNDER_MAINTENANCE
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -24,6 +30,9 @@ public class Property {
     @Column(length = 2000)
     private String photos;
 
+    @Enumerated(EnumType.STRING)
+    private PropertyStatus status;
+
     @ManyToOne
     @JoinColumn(name = "landlord_id", nullable = false)
     @JsonIgnore
@@ -33,6 +42,7 @@ public class Property {
     private List<Tenancy> tenancies = new ArrayList<>();
 
     public Property() {
+        this.status = PropertyStatus.AVAILABLE;
     }
 
     public Long getId() {
@@ -97,6 +107,14 @@ public class Property {
 
     public void setPhotos(String photos) {
         this.photos = photos;
+    }
+
+    public PropertyStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(PropertyStatus status) {
+        this.status = status;
     }
 
     public ApplicationUser getLandlord() {

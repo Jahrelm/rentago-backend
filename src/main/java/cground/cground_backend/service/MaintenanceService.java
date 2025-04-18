@@ -14,11 +14,11 @@ public interface MaintenanceService {
     Maintenance createMaintenanceForUser(Integer userId);
     List<MaintenanceRequest> getAllRequestForTenant(Integer userId);
     List<MaintenanceRequest> getAllRequestsForLandlord(Integer landlordId);
-    List<ApplicationUser> getTenantsByLandlord(Integer landlordId);
-    Property addPropertyForLandlord(Integer landlordId, Property property, MultipartFile[] photos) throws IOException;
-    Tenancy addTenantToProperty(Integer tenantId, Long propertyId, Tenancy tenancy);
     List<Property> getAllPropertyByLandlord(Integer landlordId);
     List<Property> getPropertiesByTenant(Integer tenantId);
+    List<ApplicationUser> getTenantsByLandlord(Integer landlordId);
+    Property addPropertyForLandlord(Integer landlordId, Property property, MultipartFile[] photos) throws IOException;
     List<Property> searchProperty(Integer landlordId, String address);
+    Tenancy addTenantToProperty(Integer tenantId, Long propertyId, Tenancy tenancy);
 }
 
